@@ -4,4 +4,4 @@ This is the repository for the Notre Dame Rocketry Team's Apogee Control System.
 
 ## Contributors
 
-<your name here>
+Patrick Faley
