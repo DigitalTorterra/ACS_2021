@@ -63,9 +63,7 @@ def initialize_sensors():
 
 # Reading Functions
 def read_accelerometer():
-    while True:
-        print("%f %f %f"acclerometer.acceleration)
-        time.sleep(0.25)
+        return acclerometer.acceleration
     """
     Author:
     This function reads values from the accelerometer
