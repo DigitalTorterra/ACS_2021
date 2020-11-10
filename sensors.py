@@ -9,8 +9,12 @@ MPU9250/6500 - IMU
 """
 
 # Import libraries
+import board
+import busio 
+import adafruit_mpl3115a2
 
 # Global variables
+i2c = busio.I2C(board.SCL, board.SDA)
 
 
 # Initialization functions
@@ -32,6 +36,7 @@ def initialize_altimeter():
     Output: boolean, True if initialized correctly,
     false if initialized incorrectly
     """
+    altimeter = adafruit_mpl3115a2.MPL3115A2(i2c)
     return False
 
 def initialize_imu():
@@ -73,7 +78,12 @@ def read_altimeter():
     Input: None
     Output: Current height of the rocket
     """
-    return 0
+    sensor.sealevel_pressure = 102250 
+    pressure = sensor.pressure
+    altitude = sensor.altitude
+    temperature = sensor.temperature
+    time.sleep(1.0)
+    return altitude
 
 def read_imu():
     """
