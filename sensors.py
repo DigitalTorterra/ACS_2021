@@ -9,23 +9,28 @@ MPU9250/6500 - IMU
 """
 
 # Import libraries
+import time
+import time
 import board
-import busio 
+import busio
+import adafruit_adxl34x
 import adafruit_mpl3115a2
 
 # Global variables
-i2c = busio.I2C(board.SCL, board.SDA)
+i2c = busio.I2c(board.SCL, board.SDA)
 
 
 # Initialization functions
 def initialize_accelerometer():
     """
-    Author:
+    Author: Nick Crnkovich
     This function initializes the accelerometer.
     Input: None
     Output: boolean, True if initialized correctly,
     false if initialized incorrectly
     """
+    acclerometer = adafruit_adxl34x.ADXL345(i2c)
+
     return False
 
 def initialize_altimeter():
@@ -62,6 +67,7 @@ def initialize_sensors():
 
 # Reading Functions
 def read_accelerometer():
+        return acclerometer.acceleration
     """
     Author:
     This function reads values from the accelerometer
