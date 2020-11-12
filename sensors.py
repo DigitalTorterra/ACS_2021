@@ -23,7 +23,6 @@ accelerometer = None
 altimeter = None
 imu = None
 
-mpu9250 = FaBo9Axis_MPU9250.MPU9250()
 
 # Initialization functions
 def initialize_accelerometer():
@@ -34,6 +33,7 @@ def initialize_accelerometer():
     Output: boolean, True if initialized correctly,
     false if initialized incorrectly
     """
+    global acclerometer
     acclerometer = adafruit_adxl34x.ADXL345(i2c)
     return True
 
@@ -45,6 +45,7 @@ def initialize_altimeter():
     Output: boolean, True if initialized correctly,
     false if initialized incorrectly
     """
+    global altimeter
     altimeter = adafruit_mpl3115a2.MPL3115A2(i2c)
     altimeter.sealevel_pressure = 102250
     return True
@@ -57,6 +58,7 @@ def initialize_imu():
     Output: boolean, True if initialized correctly,
     false if initialized incorrectly
     """
+    global imu
     imu = FaBo9Axis_MPU9250.MPU9250()
     return True
 
@@ -69,7 +71,7 @@ def initialize_sensors():
     Output: boolean, True if initialized correctly,
     false if initialized incorrectly
     """
-    return False
+    return initialize_accelerometer() and initialize_altimeter() and initialize_imu()
 
 # Reading Functions
 def read_accelerometer():
@@ -80,7 +82,8 @@ def read_accelerometer():
     Output: Ordered tuple containing the x, y, and z
     acceleration
     """
-    return acclerometer.acceleration
+    acceleration = acclerometer.acceleration
+    return acceleration
 
 def read_altimeter():
     """
@@ -101,11 +104,14 @@ def read_imu():
     output from the IMU (minimum orientation and 
     acceleration)
     """
-    accel = mpu9250.readAccel()
+    accel = imu.readAccel()
+    magnet_val = imu.readGyro()
+    gyro_val = imu.readMagnet()
 
     out = {
-        "acceleration": (0,0,0),
-        "orientation": (0,0,0)
+        "acceleration": accel,
+        "magnetometer": magnet_val,
+        "gyroscope": gyro_val
     }
 
     return out
@@ -121,12 +127,12 @@ def read_sensors():
     """
 
     out = {
-        "accelerometer": (0,0,0),
-        "altimeter": 0,
-        "imu": {
-            "acceleration": (0,0,0),
-            "orientation": (0,0,0)
-        }
+        "accelerometer": read_accelerometer(),
+        "altimeter": read_altimeter(),
+        "imu": read_imu()
     }
 
     return out
+
+if __name__ == "__main__":
+    print("Hello world!")
