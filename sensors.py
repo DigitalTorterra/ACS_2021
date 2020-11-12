@@ -15,10 +15,15 @@ import board
 import busio
 import adafruit_adxl34x
 import adafruit_mpl3115a2
+import FaBo9Axis_MPU9250
 
 # Global variables
 i2c = busio.I2c(board.SCL, board.SDA)
+accelerometer = None
+altimeter = None
+imu = None
 
+mpu9250 = FaBo9Axis_MPU9250.MPU9250()
 
 # Initialization functions
 def initialize_accelerometer():
@@ -30,8 +35,7 @@ def initialize_accelerometer():
     false if initialized incorrectly
     """
     acclerometer = adafruit_adxl34x.ADXL345(i2c)
-
-    return False
+    return True
 
 def initialize_altimeter():
     """
@@ -42,7 +46,8 @@ def initialize_altimeter():
     false if initialized incorrectly
     """
     altimeter = adafruit_mpl3115a2.MPL3115A2(i2c)
-    return False
+    altimeter.sealevel_pressure = 102250
+    return True
 
 def initialize_imu():
     """
@@ -52,7 +57,8 @@ def initialize_imu():
     Output: boolean, True if initialized correctly,
     false if initialized incorrectly
     """
-    return False
+    imu = FaBo9Axis_MPU9250.MPU9250()
+    return True
 
 def initialize_sensors():
     """
@@ -67,7 +73,6 @@ def initialize_sensors():
 
 # Reading Functions
 def read_accelerometer():
-        return acclerometer.acceleration
     """
     Author:
     This function reads values from the accelerometer
@@ -75,7 +80,7 @@ def read_accelerometer():
     Output: Ordered tuple containing the x, y, and z
     acceleration
     """
-    return (0,0,0)
+    return acclerometer.acceleration
 
 def read_altimeter():
     """
@@ -84,11 +89,7 @@ def read_altimeter():
     Input: None
     Output: Current height of the rocket
     """
-    sensor.sealevel_pressure = 102250 
-    pressure = sensor.pressure
-    altitude = sensor.altitude
-    temperature = sensor.temperature
-    time.sleep(1.0)
+    altitude = altimeter.altitude
     return altitude
 
 def read_imu():
@@ -100,6 +101,7 @@ def read_imu():
     output from the IMU (minimum orientation and 
     acceleration)
     """
+    accel = mpu9250.readAccel()
 
     out = {
         "acceleration": (0,0,0),
