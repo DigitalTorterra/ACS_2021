@@ -44,7 +44,7 @@ def initialize_accelerometer():
     global accelerometer
     
     accelerometer = adafruit_adxl34x.ADXL345(i2c)
-    accelerometer.range = adafruit_adxl34x.Range.RANGE_4_G
+    accelerometer.range = adafruit_adxl34x.Range.RANGE_16_G
     accelerometer.data_rate = adafruit_adxl34x.DataRate.RATE_100_HZ
 
     manager.add_data(data_manager.Tuple_Data('adxl_acceleration'))
