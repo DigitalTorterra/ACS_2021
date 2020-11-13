@@ -125,7 +125,10 @@ def read_accelerometer():
     Output: Ordered tuple containing the x, y, and z
     acceleration
     """
-    acceleration = accelerometer.acceleration
+    try:
+        acceleration = accelerometer.acceleration
+    except:
+        acceleration = [0,0,0]
     manager.update_field('adxl_acceleration', acceleration)
     return acceleration
 
@@ -136,7 +139,10 @@ def read_altimeter():
     Input: None
     Output: Current height of the rocket
     """
-    altitude = altimeter.altitude
+    try:
+        altitude = altimeter.altitude
+    except:
+        altitude = 0
     manager.update_field('mpl_altitude', altitude)
     return altitude
 
@@ -149,9 +155,18 @@ def read_imu():
     output from the IMU (minimum orientation and 
     acceleration)
     """
-    accel = imu.readAccel()
-    magnet_val = imu.readGyro()
-    gyro_val = imu.readMagnet()
+    try:
+        accel = imu.readAccel()
+    except:
+        accel = (0,0,0)
+    try:
+        magnet_val = imu.readGyro()
+    except:
+        magnet_val = (0,0,0)
+    try:
+        gyro_val = imu.readMagnet()
+    except:
+        gyro_val = (0,0,0)
 
     manager.update_dict_field('mpu_acceleration', accel)
     manager.update_dict_field('mpu_magnetometer', magnet_val)
