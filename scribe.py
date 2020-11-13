@@ -4,9 +4,15 @@ to a CSV file for later usage
 """
 
 # Import modules
+import glob
+import utils
+import csv
 
 # Global variables
-filename = './data/out.csv'
+root_dir = './data/'
+file_name = 'out'
+file_extension = '.csv'
+file_path = ''
 
 # Functions
 def gen_filename():
@@ -19,7 +25,13 @@ def gen_filename():
     Input: None
     Output: None
     """
-    pass
+    files = glob.glob(f'{root_dir}{file_name}*{file_extension}')
+    file_nums = map(utils.string_to_int, files)
+    out_num = max(file_nums) + 1 
+
+    global file_path
+    file_path = f'{root_dir}{file_name}{out_num}{file_extension}'
+
 
 def initialize_file():
     """
@@ -28,7 +40,11 @@ def initialize_file():
     Input: None
     Output: None
     """
-    pass
+    gen_filename()
+
+    with open(file_path, 'w') as f:
+        writer = csv.DictWriter(f, )
+
 
 def write_row(data, filtered_data, angle, state):
     """

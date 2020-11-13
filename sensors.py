@@ -10,15 +10,18 @@ MPU9250/6500 - IMU
 
 # Import libraries
 import time
-import time
 import board
 import busio
 import adafruit_adxl34x
 import adafruit_mpl3115a2
 import FaBo9Axis_MPU9250
+import logging
+
+# Parameters
+ALTITUDE_STEPS = 100
 
 # Global variables
-i2c = busio.I2c(board.SCL, board.SDA)
+i2c = busio.I2C(board.SCL, board.SDA)
 accelerometer = None
 altimeter = None
 imu = None
@@ -33,8 +36,12 @@ def initialize_accelerometer():
     Output: boolean, True if initialized correctly,
     false if initialized incorrectly
     """
+    logging.info("Initializing accelerometer")
     global acclerometer
+    
     acclerometer = adafruit_adxl34x.ADXL345(i2c)
+    accelerometer.range(adafruit_adxl34x.RANGE_16_G)
+
     return True
 
 def initialize_altimeter():
@@ -45,9 +52,16 @@ def initialize_altimeter():
     Output: boolean, True if initialized correctly,
     false if initialized incorrectly
     """
+    logging.info("Initializing altimeter")
     global altimeter
+
     altimeter = adafruit_mpl3115a2.MPL3115A2(i2c)
-    altimeter.sealevel_pressure = 102250
+
+    pressure_sum = 0
+    for i in range(ALTITUDE_STEPS):
+        pressure_sum += altimeter.pressure()
+    altimeter.sealevel_pressure(pressure_sum / ALTITUDE_STEPS)
+    
     return True
 
 def initialize_imu():
@@ -58,8 +72,13 @@ def initialize_imu():
     Output: boolean, True if initialized correctly,
     false if initialized incorrectly
     """
+    logging.info("Initializing IMU")
     global imu
+
     imu = FaBo9Axis_MPU9250.MPU9250()
+    imu.configureMPU9250(FaBo9Axis_MPU9250.GFS_2000, FaBo9Axis_MPU9250.AFS_16G)
+
+
     return True
 
 def initialize_sensors():
@@ -71,6 +90,7 @@ def initialize_sensors():
     Output: boolean, True if initialized correctly,
     false if initialized incorrectly
     """
+    logging.info("Initializing sensors...")
     return initialize_accelerometer() and initialize_altimeter() and initialize_imu()
 
 # Reading Functions
@@ -134,5 +154,8 @@ def read_sensors():
 
     return out
 
+
 if __name__ == "__main__":
-    print("Hello world!")
+    initialize_sensors()
+    out = read_sensors()
+    print(out)
