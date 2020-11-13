@@ -12,3 +12,9 @@ def string_to_int(in_str):
     out = int(''.join(int_vals))
 
     return out
+
+def format_float_list(in_list):
+    """
+    Formats a list into a more print-friendly format
+    """
+    return [f'{i:.4f}' for i in in_list]

@@ -4,9 +4,11 @@ to a CSV file for later usage
 """
 
 # Import modules
+import logging
 import glob
 import utils
 import csv
+import data_manager
 
 # Global variables
 root_dir = './data/'
@@ -26,14 +28,14 @@ def gen_filename():
     Output: None
     """
     files = glob.glob(f'{root_dir}{file_name}*{file_extension}')
-    file_nums = map(utils.string_to_int, files)
-    out_num = max(file_nums) + 1 
+    file_nums = list(map(utils.string_to_int, files))
+    out_num = max(file_nums) + 1 if len(file_nums) > 0 else 0
 
     global file_path
     file_path = f'{root_dir}{file_name}{out_num}{file_extension}'
 
 
-def initialize_file():
+def initialize_file(manager):
     """
     This function creates the file and writes
     its header.
@@ -43,10 +45,11 @@ def initialize_file():
     gen_filename()
 
     with open(file_path, 'w') as f:
-        writer = csv.DictWriter(f, )
+        writer = csv.DictWriter(f, fieldnames=manager.get_field_names())
+        writer.writeheader()
 
 
-def write_row(data, filtered_data, angle, state):
+def write_row(manager):
     """
     This function writes the current state
     (raw data, filtered data, servo angle and state)
@@ -57,4 +60,21 @@ def write_row(data, filtered_data, angle, state):
            state: state of the system
     Output: None
     """
-    pass
+    with open(file_path, 'a') as f:
+        writer = csv.writer(f)
+        writer.writerow(utils.format_float_list(manager.get_field_values()))
+
+
+if __name__ == "__main__":
+    #logging.basicConfig(level=logging.DEBUG)
+
+    import sensors
+    sensors.initialize_sensors()
+    initialize_file(sensors.manager)
+
+    while True:
+        try:
+            sensors.read_sensors()
+            write_row(sensors.manager)
+        except Exception as e:
+            logging.error(e)
