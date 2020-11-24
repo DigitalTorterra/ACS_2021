@@ -18,6 +18,9 @@ v0 = 0; % initial velocity
 RocketPos = 0.*Ground; % initial position
 
 % Compute local wind velocity and atmospheric conditions
+rho_air = 0.002378; % [slugs/ft^3] density of air
+c_air = 1120; % [ft/s] speed of sound at 70 deg F
+T = 68; % [def F] atmospheric temperature
 
 
 
@@ -42,7 +45,7 @@ RocketPos = 0.*Ground; % initial position
 % Compute effect of motor thrust and gravity
 
 % Mass and force from motor
-
+[motorThrust, motorMass] = motorfunction(t); % returns mass in oz and thrust in lbf
 
 
 % Compute mass, moments of inertia, and linear and angular acceleration

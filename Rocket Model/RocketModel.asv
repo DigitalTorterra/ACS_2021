@@ -9,10 +9,43 @@
 
 
 % Initialize rocket conditions
+Ground = [1; 1; 1];
+
 
 w = 10; % windspeed (pick units)
-alpha = 5; % [deg] angl
+alpha = 5; % [deg] launch angle
+v0 = 0; % initial velocity
+RocketPos = 0.*Ground; % initial position
 
+% Compute local wind velocity and atmospheric conditions
+rho_air = 0.002378; % [
+
+
+
+
+% Compute airspeed, angle of attack, lateral wind speed, Reynolds number...
+
+
+
+
+% Compute aerodynamic forces and moments
+
+% Base drag
+
+% body pressure drag
+
+% Parasitic drag from tabs
+
+
+
+
+% Compute effect of motor thrust and gravity
+
+% Mass and force from motor
+
+
+
+% Compute mass, moments of inertia, and linear and angular acceleration
 
 
 
