@@ -1,0 +1,19 @@
+%% RocketModel
+
+% November 2020
+% Created by Nick Crnkovich
+
+% Model using formulas and documentation from OpenRocket to generate our
+% own simulation of the rocket apogee and position, velocity, acceleration
+% data to be used for controller and ACS design
+
+
+% Initialize rocket conditions
+
+w = 10; % windspeed (pick units)
+alpha = 5; % [deg] angl
+
+
+
+
+% Numerical integration using RK 4
