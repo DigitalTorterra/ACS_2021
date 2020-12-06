@@ -63,14 +63,17 @@ while rocketSpeed > -2
     % Compute aerodynamic forces and moments
     
     % Base drag
-    
+    drag_coefficient = 0.04; %streamlined body
+    A = (diamR/2)^2 * pi
+    p = 1;
+    drag_force = drag_coefficient * a * p * airspeed^2 / 2;
+
     % body pressure drag
     
     % Parasitic drag from tabs
     
     
-    
-    
+       
     % Compute effect of motor thrust and gravity
     
     % Mass and force from motor
