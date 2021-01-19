@@ -19,11 +19,13 @@ if t < 3.5 % Check if burnout has occurred
     motorMass = (massFull - t*burnRate)*35.274; % and converted to oz
     % See where in motor curve rocket is
     for i = 1:length(tVector)-1
-        if t < tVector(i+1)
+        if t > tVector(i) && t < tVector(i+1)
             motorThrust = thrustVector(i) +...
                 (t - tVector(i))*(thrustVector(i+1) - thrustVector(i))...
                 /(tVector(i+1) - tVector(i)); % Interpolate thrust
-            
+        elseif t < 0.02
+            motorThrust = thrustVector(1);
+            break
         end
         
     end
