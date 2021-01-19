@@ -37,29 +37,29 @@ RocketPos = [lengthR*sind(theta); 0; lengthR*cosd(theta)];
 % Compute local wind velocity and atmospheric conditions
 rho_air = 0.002378; % [slugs/ft^3] density of air
 c_air = 1120; % [ft/s] speed of sound at 70 deg F
-T = 68; % [def F] atmospheric temperature
-
+T = 68; % [deg F] atmospheric temperature
+nu = 1.621e-4; % [ft^2/s] kinematic viscosity of air at 68 deg
 [windTime, windspeed] = windGenerator(u); % windspeed is in mph
 wfps = windspeed.*5280/3600; % convert to [ft/s]
 
 rocketSpeed = abs(RocketVel);
-
+t = 0;
+iCnt = 1;
 %% Run loop
-while rocketSpeed > -2
-    t = 0;
-    iCnt = 1;
-    
+while rocketSpeed > -2   
     
     % Compute airspeed, angle of attack, lateral wind speed, Reynolds number...
     w_wind = (wfps(iCnt) + (t - windTime(iCnt))*(wfps(iCnt+1) - wfps(iCnt))...
         /(windTime(iCnt+1) - windTime(iCnt)))*-ihat; % Interpolate windspeed
-    while rocketPos(3) < 2 % Wind is negligible til it leaves the rail
+    if RocketPos(3) < 20 % Wind is negligible til it leaves the rail
         w_wind = 0;
     end
     
     airspeed = RocketVel - w_wind; 
     
-    
+    Re = abs(airspeed)*lengthR/nu; 
+    % angle of attack is angle between velocity and airspeed
+    alpha = 0;
     % Compute aerodynamic forces and moments
     
     % Base drag
@@ -85,7 +85,7 @@ while rocketSpeed > -2
     
     
     
-    RocketSpeed = -5;
+    rocketSpeed = -5;
     t = t + dt;
     iCnt = iCnt + 1;
 end
