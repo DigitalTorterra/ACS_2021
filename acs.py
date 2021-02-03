@@ -23,10 +23,10 @@ def main():
         # Attempt to execute
         try:
             # Read data
-            data = sensors.read_sensors()
+            sensors.read_sensors()
 
             # Filter data
-            filtered_data = data_filter.filter_data(data)
+            data_filter.filter_data(sensors.manager)
 
             # Update flight state
             state.state_transition(filtered_data)

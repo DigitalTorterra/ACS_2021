@@ -60,6 +60,12 @@ class Data_Manager:
         """
         self.data[name].set_value(value)
 
+    def read_field(self, name):
+        """
+        Returns the value for a given key
+        """
+        return self.data[name]
+
     def update_dict_field(self, name, value):
         """
         Updates the value of a given field

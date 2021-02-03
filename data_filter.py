@@ -9,13 +9,83 @@ import numpy as np
 import matplotlib.pyplot as plt
 import openpyxl
 from filterpy.kalman import KalmanFilter
+from filterpy.common import Q_discrete_white_noise
+
+
 # Global variables
+my_filter = None
+t_prev = None
+
 
 # Functions
+def initialize_filter():
+    """
+    This function initializes the Kalman filter and
+    returns the initialized filter.
+    """
+
+    global my_filter
+
+    # Initialize object
+    my_filter = KalmanFilter(dim_x=3, dim_z=3)       
+
+    # Measurement/state conversion matrix
+    my_filter.H = np.array([[1,0,0],                 
+                            [0,0,1],
+                            [0,0,1]])
+
+    # Covariance matrix
+    my_filter.P *= 100
+
+    # Measurement Noise
+    my_filter.R *= 5
+
+    # Process Noise
+    my_filter.Q = Q_discrete_white_noise(dim=3, dt=0.1, var=0.13)
+
+    # Initial position
+    my_filter.x = np.array([0,0,0])
+
+    
+def gen_phi(dt):
+    """"
+    This function generates a state transition matrix
+    "phi" from a timestep.
+    """
+    dp = 1
+    ds = 0
+    di = (dt**2)/2
+
+    phi = np.array([[dp, dt, di],
+                    [ds, dp, dt],
+                    [ds, ds, dp]])
+
+    return phi
+
+def get_dt(in_time):
+    """
+    Appropriately handle the creation of
+    a timestep from the current and previous
+    times.
+    """
+    global t_prev
+
+    if t_prev == None:
+        dt = 0.1
+    else:
+        dt = in_time - t_prev
+    t_prev = in_time
+    return dt
+
+def transform_acceleration(in_accel):
+    return in_accel[1]
+
+
+
 def filter_data(sensor_data):
     """
-    Author:
-    This is the main function, which
+    Author: Patrick
+    This is the main function, which 
     filters incoming sensor data
     Input: sensor_data - a dict of data with these fields:
         - accelerometer: ordered tuple
@@ -32,34 +102,30 @@ def filter_data(sensor_data):
     height, (vertical) velocity, acceleration, and angle
     with   the ground
     """
-    f = KalmanFilter (dim_x=3, dim_z=2)
-    # Importing data and saving as individual vectors because.
-    accelXData = sensor_data[0]
-    accelYData = sensor_data[1]
-    accelZData = sensor_data[2]
-    altimeterData = sensor_data[3]
-    imuAccelXData = sensor_data[4]
-    imuAccelYData = sensor_data[5]
-    imuAccelZData = sensor_data[6]
-    imuMagXData = sensor_data[7]
-    imuMagYData = sensor_data[8]
-    imuMagZData = sensor_data[9]
-    imuGryoXData = sensor_data[10]
-    imuGryoYData = sensor_data[11]
-    imuGryoZData = sensor_data[12]
-    timeData = sensor_data[13]
-    
-# Initializing state vector and state transition matrix
-    f.x = np.array([3.5, 0., 0.]) # location, velocity, acceleration
-    f.F = np.array([1., 1. ,1.], # state transition matri
-                  [0., 1., 1.],
-                  [0., 0., 1.])
-    f.H = np.array([1., 0., 0.])  #measurement function/unit converstion
-    f.R *= R  # measurement unertainty
-    f.P[:] = P #convariance matrix
-    f.Q[:] = Q # process uncertainty/noise
 
-    dt = 0.1
-    x 
+    # Load globals
+    global my_filter
+    global t_prev
 
-    return (0,0,0,0)
+    # Read in sensor data
+    alt = sensor_data.read_field('mpl_altitude')
+    adxl_accel = sensor_data.read_field('adxl_acceleration')
+    mpu_accel = sensor_data.read_field('mpu_acceleration')
+    t = sensor_data.read_field('time')
+
+    # Timestep and acceleration
+    dt = get_dt(t)
+    adxl_accel = transform_acceleration(adxl_accel)
+    mpu_accel = transform_acceleration(mpu_accel)
+
+    # Appropriately update filter parameters
+    z = np.array([alt, adxl_accel, mpu_accel])
+    my_filter.F = gen_phi(dt)
+
+    # Perform the prediction/update steps
+    my_filter.predict()
+    my_filter.update(z)
+
+    # Log the output
+
+    return my_filter.x
