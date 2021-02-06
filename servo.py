@@ -18,7 +18,7 @@ def initialize_servo():
     """
     return False
 
-def rotate_servo(angle):
+def rotate(angle):
     """
     Author:
     This function rotates the servo to the desired

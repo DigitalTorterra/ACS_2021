@@ -9,7 +9,7 @@ you guys do
 # Import modules
 import numpy as np
 import matplotlib.pyplot as plt
-import openpyxl
+# import openpyxl
 
 # Global Variables
 initialized = False
@@ -71,6 +71,9 @@ def step(data, extension):
     Vmag_R = np.sqrt(Vx_R**2 + Vy_R**2) 
     Mach = Vmag_R/c  # Mach number
 
+    if Mach >= 1:
+        Mach = 0.99
+
     # Tab drag
     # Empirical fit for incompressible coefficient of drag tabs
     Cd_o_tabs = 10**(0.44*extension - 0.7) 
@@ -96,7 +99,6 @@ def step(data, extension):
     xSim = x_R 
 
     while VySim > 0:  
-        
         # k1vx = fx(VmagSim, Cd_rocket, Cd_tabs, A_tabs, theta, M_e) 
         k1vy = fy(VmagSim, Cd_rocket, Cd_tabs, A_tabs, theta, M_e) 
         # k1rx = VxSim 
@@ -146,7 +148,7 @@ def step(data, extension):
         extension = 1 
     elif extension < 0:
         extension = 0 
-    
+
     return extension
 
 
@@ -191,7 +193,7 @@ def fy(V, Cd_rocket, Cd_tabs, A_tabs, theta, M_e):
     g = 9.81 # [m/s **2] gravity
     A_rocket = (6.17*0.0254/2)**2*np.pi # [diamter in to m] [m**2]
 
-    Ky = -(0.5*rho*Cd_rocket*V**2*A_rocket*np.sin(theta) - 0.5*rho*Cd_tabs*V**2*A_tabs*np.sin(theta) - M_e*g)/M_e
+    Ky = (-0.5*rho*Cd_rocket*V**2*A_rocket*np.sin(theta) - 0.5*rho*Cd_tabs*V**2*A_tabs*np.sin(theta) - M_e*g)/M_e
 
     return Ky
  

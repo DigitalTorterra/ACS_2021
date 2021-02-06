@@ -7,7 +7,7 @@ libraries are required
 # Import libraries
 import numpy as np
 import matplotlib.pyplot as plt
-import openpyxl
+# import openpyxl
 from filterpy.kalman import KalmanFilter
 from filterpy.common import Q_discrete_white_noise
 
@@ -107,16 +107,27 @@ def filter_data(sensor_data):
     global my_filter
     global t_prev
 
+    # Make sure filter is initialized
+    if my_filter == None:
+        raise Error("Filter not initialized!")
+
     # Read in sensor data
     alt = sensor_data.read_field('mpl_altitude')
     adxl_accel = sensor_data.read_field('adxl_acceleration')
     mpu_accel = sensor_data.read_field('mpu_acceleration')
     t = sensor_data.read_field('time')
 
+    t = t.get_value()
+    alt = alt.get_value()
+    adxl_accel = adxl_accel.get_value_list()
+    mpu_accel = mpu_accel.get_value_list()
+
     # Timestep and acceleration
     dt = get_dt(t)
-    adxl_accel = transform_acceleration(adxl_accel)
+    #adxl_accel = transform_acceleration(adxl_accel)
+    adxl_accel = mpu_accel
     mpu_accel = transform_acceleration(mpu_accel)
+    adxl_accel = mpu_accel
 
     # Appropriately update filter parameters
     z = np.array([alt, adxl_accel, mpu_accel])
