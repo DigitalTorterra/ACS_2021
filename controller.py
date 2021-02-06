@@ -202,7 +202,3 @@ def fx(V, Cd_rocket, Cd_tabs, A_tabs, theta, M_e):
 
     Kx = -(0.5*rho*Cd_rocket*V**2*A_rocket*np.cos(theta) - 0.5*rho*Cd_tabs*V**2*A_tabs*np.cos(theta))/M_e
     return Kx
-
-
-
-    

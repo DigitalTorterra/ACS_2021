@@ -17,6 +17,7 @@ import scribe
 # Initialize modules
 sensors.initialize_sensors()
 servo_angle = 0
+extension = 0
 
 def main():
     # Main loop
@@ -38,8 +39,9 @@ def main():
                 if not controller.initialized:
                     controller.initialize(filtered_data)
 
-                controller.step(filtered_data, servo_angle)
-                servo_angle = controller.get_angle()
+                extension = controller.step(filtered_data, extension)
+                servo_angle = controller.get_angle(extension)
+
             elif curr_state == 'Overshoot':
                 servo_angle = controller.get_max()
             else:
