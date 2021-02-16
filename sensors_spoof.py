@@ -9,12 +9,8 @@ MPU9250/6500 - IMU
 """
 
 # Import libraries
+import csv
 import time
-import board
-import busio
-import adafruit_adxl34x
-import adafruit_mpl3115a2
-import FaBo9Axis_MPU9250
 import logging
 import data_manager
 from data_manager import Data_Manager
@@ -23,16 +19,16 @@ from data_manager import Data_Manager
 ALTITUDE_STEPS = 100
 
 # Global variables
-i2c = busio.I2C(board.SCL, board.SDA)
 
 accelerometer = None
 altimeter = None
 imu = None
+times = None
 
-
+read_row = lambda data, key: [row[key] for row in data]
 
 # Initialization functions
-def initialize_accelerometer(manager: Data_Manager) -> bool:
+def initialize_accelerometer(manager: Data_Manager, rows) -> bool:
     """
     Author: Nick Crnkovich
     This function initializes the accelerometer.
@@ -43,15 +39,17 @@ def initialize_accelerometer(manager: Data_Manager) -> bool:
     logging.info("Initializing accelerometer")
     global accelerometer
     
-    accelerometer = adafruit_adxl34x.ADXL345(i2c)
-    accelerometer.range = adafruit_adxl34x.Range.RANGE_16_G
-    accelerometer.data_rate = adafruit_adxl34x.DataRate.RATE_100_HZ
-
     manager.add_data(data_manager.Tuple_Data('adxl_acceleration'))
+    
+    adxl_x = read_row(rows, 'adxl_acceleration_x')
+    adxl_y = read_row(rows, 'adxl_acceleration_y')
+    adxl_z = read_row(rows, 'adxl_acceleration_z')
+
+    accelerometer = iter(zip(adxl_x, adxl_y, adxl_z))
 
     return True
 
-def initialize_altimeter(manager: Data_Manager) -> bool:
+def initialize_altimeter(manager: Data_Manager, rows) -> bool:
     """
     Author:
     This function initializes the altimeter.
@@ -62,19 +60,13 @@ def initialize_altimeter(manager: Data_Manager) -> bool:
     logging.info("Initializing altimeter")
     global altimeter
 
-    altimeter = adafruit_mpl3115a2.MPL3115A2(i2c)
-    altimeter._ctrl_reg1 = adafruit_mpl3115a2._MPL3115A2_CTRL_REG1_OS1 | adafruit_mpl3115a2._MPL3115A2_CTRL_REG1_ALT
-
-    pressure_sum = 0
-    for _ in range(ALTITUDE_STEPS):
-        pressure_sum += altimeter.pressure
-    altimeter.sealevel_pressure = int(pressure_sum / ALTITUDE_STEPS)
-
     manager.add_data(data_manager.Scalar_Data('mpl_altitude'))
+
+    altimeter = iter(read_row(rows, 'mpl_altitude'))
     
     return True
 
-def initialize_imu(manager: Data_Manager) -> bool:
+def initialize_imu(manager: Data_Manager, rows) -> bool:
     """
     Author:
     This function initializes the IMU.
@@ -85,40 +77,59 @@ def initialize_imu(manager: Data_Manager) -> bool:
     logging.info("Initializing IMU")
     global imu
 
-    imu = FaBo9Axis_MPU9250.MPU9250()
-    imu.configMPU9250(FaBo9Axis_MPU9250.GFS_2000, FaBo9Axis_MPU9250.AFS_16G)
-
     manager.add_data(data_manager.Tuple_Data('mpu_acceleration'))
     manager.add_data(data_manager.Tuple_Data('mpu_gyroscope'))
     manager.add_data(data_manager.Tuple_Data('mpu_magnetometer'))
 
+    mpu_accel_x = read_row(rows, 'mpu_acceleration_x')
+    mpu_accel_y = read_row(rows, 'mpu_acceleration_y')
+    mpu_accel_z = read_row(rows, 'mpu_acceleration_z')
+    mpu_gyro_x = read_row(rows, 'mpu_gyroscope_x')
+    mpu_gyro_y = read_row(rows, 'mpu_gyroscope_y')
+    mpu_gyro_z = read_row(rows, 'mpu_gyroscope_z')
+    mpu_mag_x = read_row(rows, 'mpu_magnetometer_x')
+    mpu_mag_y = read_row(rows, 'mpu_magnetometer_y')
+    mpu_mag_z = read_row(rows, 'mpu_magnetometer_z')
+
+    imu = iter(zip(mpu_accel_x, mpu_accel_y, mpu_accel_z,
+                   mpu_gyro_x, mpu_gyro_y, mpu_gyro_z,
+                   mpu_mag_x, mpu_mag_y, mpu_mag_z))
+
     return True
 
-def initialize_timer(manager: Data_Manager) -> bool:
+def initialize_timer(manager: Data_Manager, rows) -> bool:
     """
     Initializes time data
     """
     logging.info("Initializing timer...")
     manager.add_data(data_manager.Scalar_Data('time'))
 
+    global times
+    times = iter(read_row(rows, 'time'))
+
     return True
 
-def initialize_sensors(manager: Data_Manager) -> bool:
+def initialize_sensors(path: str, manager: Data_Manager) -> bool:
     """
     This function initializes all the sensors
     Note: call other functions in the design
     """
     logging.info("Initializing sensors...")
 
+    # Read in data
+    with open(path, newline='') as f:
+        reader = csv.DictReader(f)
+        rows = [row for row in reader]
+
     # Initialize active sensors
-    result = initialize_timer(manager)
+    result = initialize_timer(manager, rows)
     for sensor in manager.active_sensors:
         if sensor == 'IMU':
-            result = result and initialize_imu(manager)
+            result = result and initialize_imu(manager, rows)
         elif sensor == 'Accelerometer':
-            result = result and initialize_accelerometer(manager)
+            result = result and initialize_accelerometer(manager, rows)
         elif sensor == 'Altimeter':
-            result = result and initialize_altimeter(manager)
+            result = result and initialize_altimeter(manager, rows)
 
     return result
 
@@ -133,7 +144,7 @@ def read_accelerometer(manager: Data_Manager):
     acceleration
     """
     try:
-        acceleration = accelerometer.acceleration
+        acceleration = next(accelerometer)
     except:
         acceleration = [0,0,0]
     manager.update_field('adxl_acceleration', acceleration)
@@ -146,7 +157,7 @@ def read_altimeter(manager: Data_Manager):
     Output: Current height of the rocket
     """
     try:
-        altitude = altimeter.altitude
+        altitude = next(altimeter)
     except:
         altitude = 0
     manager.update_field('mpl_altitude', altitude)
@@ -160,18 +171,10 @@ def read_imu(manager: Data_Manager):
     output from the IMU (minimum orientation and 
     acceleration)
     """
-    try:
-        accel = imu.readAccel()
-    except:
-        accel = (0,0,0)
-    try:
-        magnet_val = imu.readGyro()
-    except:
-        magnet_val = (0,0,0)
-    try:
-        gyro_val = imu.readMagnet()
-    except:
-        gyro_val = (0,0,0)
+    data = next(imu)
+    accel = data[:3]
+    magnet_val = data[3:6]
+    gyro_val = data[6:]
 
     manager.update_dict_field('mpu_acceleration', accel)
     manager.update_dict_field('mpu_magnetometer', magnet_val)
@@ -181,7 +184,7 @@ def read_time(manager: Data_Manager):
     """
     Returns the current time
     """
-    current_time = time.time()
+    current_time = next(times)
     manager.update_field('time', current_time)
 
 

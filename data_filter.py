@@ -5,6 +5,8 @@ libraries are required
 """
 
 # Import libraries
+import data_manager
+from data_manager import Data_Manager
 import numpy as np
 import matplotlib.pyplot as plt
 # import openpyxl
@@ -18,7 +20,7 @@ t_prev = None
 
 
 # Functions
-def initialize_filter():
+def initialize_filter(manager: Data_Manager):
     """
     This function initializes the Kalman filter and
     returns the initialized filter.
@@ -26,13 +28,20 @@ def initialize_filter():
 
     global my_filter
 
+    # Initialize measurement matrix based on number/type of sensors
+    H = []
+    if 'Altimeter' in manager.active_sensors:
+        H.append([1,0,0])
+    if 'Accelerometer' in manager.active_sensors:
+        H.append([0,0,1])
+    if 'IMU' in manager.active_sensors:
+        H.append([0,0,1])
+
     # Initialize object
-    my_filter = KalmanFilter(dim_x=3, dim_z=3)       
+    my_filter = KalmanFilter(dim_x=3, dim_z=len(H))       
 
     # Measurement/state conversion matrix
-    my_filter.H = np.array([[1,0,0],                 
-                            [0,0,1],
-                            [0,0,1]])
+    my_filter.H = np.array(H)
 
     # Covariance matrix
     my_filter.P *= 100
@@ -45,6 +54,11 @@ def initialize_filter():
 
     # Initial position
     my_filter.x = np.array([0,0,0])
+
+    # Initialize data manager
+    manager.add_data(data_manager.Scalar_Data('kalman_height'))
+    manager.add_data(data_manager.Scalar_Data('kalman_velocity'))
+    manager.add_data(data_manager.Scalar_Data('kalman_acceleration'))
 
     
 def gen_phi(dt):
@@ -77,12 +91,14 @@ def get_dt(in_time):
     t_prev = in_time
     return dt
 
-def transform_acceleration(in_accel):
+def transform_adxl(in_accel):
+    return in_accel[1]
+
+def transform_mpu(in_accel):
     return in_accel[1]
 
 
-
-def filter_data(sensor_data):
+def filter_data(manager: Data_Manager):
     """
     Author: Patrick
     This is the main function, which 
@@ -109,28 +125,24 @@ def filter_data(sensor_data):
 
     # Make sure filter is initialized
     if my_filter == None:
-        raise Error("Filter not initialized!")
+        raise Exception("Filter not initialized!")
 
     # Read in sensor data
-    alt = sensor_data.read_field('mpl_altitude')
-    adxl_accel = sensor_data.read_field('adxl_acceleration')
-    mpu_accel = sensor_data.read_field('mpu_acceleration')
-    t = sensor_data.read_field('time')
-
-    t = t.get_value()
-    alt = alt.get_value()
-    adxl_accel = adxl_accel.get_value_list()
-    mpu_accel = mpu_accel.get_value_list()
-
-    # Timestep and acceleration
+    measurements = []
+    if 'Altimeter' in manager.active_sensors:
+        measurements.append(manager.read_field('mpl_altitude').get_value())
+    if 'Accelerometer' in manager.active_sensors:
+        accel = manager.read_field('adxl_acceleration').get_value_list()
+        measurements.append(transform_adxl(accel))
+    if 'IMU' in manager.active_sensors:
+        accel = manager.read_field('mpu_acceleration').get_value_list()
+        measurements.append(transform_mpu(accel))
+            
+    t = manager.read_field('time').get_value()
     dt = get_dt(t)
-    #adxl_accel = transform_acceleration(adxl_accel)
-    adxl_accel = mpu_accel
-    mpu_accel = transform_acceleration(mpu_accel)
-    adxl_accel = mpu_accel
 
     # Appropriately update filter parameters
-    z = np.array([alt, adxl_accel, mpu_accel])
+    z = np.array(measurements)
     my_filter.F = gen_phi(dt)
 
     # Perform the prediction/update steps
@@ -138,5 +150,7 @@ def filter_data(sensor_data):
     my_filter.update(z)
 
     # Log the output
-
-    return my_filter.x
+    y,v,a = my_filter.x
+    manager.update_dict_field('kalman_height', y)
+    manager.update_dict_field('kalman_velocity', v)
+    manager.update_dict_field('kalman_acceleration', a)

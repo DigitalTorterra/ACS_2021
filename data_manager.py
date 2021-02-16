@@ -45,8 +45,9 @@ class Tuple_Data(Data):
 
 
 class Data_Manager:
-    def __init__(self):
+    def __init__(self, active_sensors):
         self.data = {}
+        self.active_sensors = active_sensors
 
     def add_data(self, data_obj):
         """
