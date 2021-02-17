@@ -92,10 +92,10 @@ def get_dt(in_time):
     return dt
 
 def transform_adxl(in_accel):
-    return in_accel[1]
+    return float(in_accel[0])*-1-10.340865
 
 def transform_mpu(in_accel):
-    return in_accel[1]
+    return float(in_accel[1])
 
 
 def filter_data(manager: Data_Manager):
@@ -130,7 +130,7 @@ def filter_data(manager: Data_Manager):
     # Read in sensor data
     measurements = []
     if 'Altimeter' in manager.active_sensors:
-        measurements.append(manager.read_field('mpl_altitude').get_value())
+        measurements.append(float(manager.read_field('mpl_altitude').get_value()))
     if 'Accelerometer' in manager.active_sensors:
         accel = manager.read_field('adxl_acceleration').get_value_list()
         measurements.append(transform_adxl(accel))
@@ -138,7 +138,7 @@ def filter_data(manager: Data_Manager):
         accel = manager.read_field('mpu_acceleration').get_value_list()
         measurements.append(transform_mpu(accel))
             
-    t = manager.read_field('time').get_value()
+    t = float(manager.read_field('time').get_value())
     dt = get_dt(t)
 
     # Appropriately update filter parameters
@@ -151,6 +151,6 @@ def filter_data(manager: Data_Manager):
 
     # Log the output
     y,v,a = my_filter.x
-    manager.update_dict_field('kalman_height', y)
-    manager.update_dict_field('kalman_velocity', v)
-    manager.update_dict_field('kalman_acceleration', a)
+    manager.update_field('kalman_height', y)
+    manager.update_field('kalman_velocity', v)
+    manager.update_field('kalman_acceleration', a)

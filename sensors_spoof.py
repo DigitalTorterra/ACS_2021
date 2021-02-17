@@ -41,9 +41,13 @@ def initialize_accelerometer(manager: Data_Manager, rows) -> bool:
     
     manager.add_data(data_manager.Tuple_Data('adxl_acceleration'))
     
-    adxl_x = read_row(rows, 'adxl_acceleration_x')
-    adxl_y = read_row(rows, 'adxl_acceleration_y')
-    adxl_z = read_row(rows, 'adxl_acceleration_z')
+    # adxl_accelerationadxl_x = read_row(rows, 'adxl_acceleration_x')
+    # adxl_accelerationadxl_y = read_row(rows, 'adxl_acceleration_y')
+    # adxl_accelerationadxl_z = read_row(rows, 'adxl_acceleration_z')
+    adxl_x = read_row(rows, 'ADXL X Acceleration')
+    adxl_y = read_row(rows, 'ADXL Y Acceleration')
+    adxl_z = read_row(rows, 'ADXL Z Acceleration')
+
 
     accelerometer = iter(zip(adxl_x, adxl_y, adxl_z))
 
@@ -62,7 +66,7 @@ def initialize_altimeter(manager: Data_Manager, rows) -> bool:
 
     manager.add_data(data_manager.Scalar_Data('mpl_altitude'))
 
-    altimeter = iter(read_row(rows, 'mpl_altitude'))
+    altimeter = iter(read_row(rows, 'Altitude m'))
     
     return True
 
@@ -105,7 +109,7 @@ def initialize_timer(manager: Data_Manager, rows) -> bool:
     manager.add_data(data_manager.Scalar_Data('time'))
 
     global times
-    times = iter(read_row(rows, 'time'))
+    times = iter(read_row(rows, 'Time ms'))
 
     return True
 

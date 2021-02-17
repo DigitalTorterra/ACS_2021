@@ -5,6 +5,8 @@ update the flight state, move the servo, and
 write output.
 """
 
+FAKE_DATA = True
+fake_path = 'fake_data/Success.csv'
 
 # Import modules
 import sensors
@@ -16,14 +18,21 @@ import scribe
 from data_manager import Data_Manager
 
 # Configuration
-active_sensors = ['IMU', 'Accelerometer', 'Altimeter']
+# active_sensors = ['IMU', 'Accelerometer', 'Altimeter']
+active_sensors = ['Accelerometer', 'Altimeter']
 manager = Data_Manager(active_sensors)
 
 # Initialize modules
-sensors.initialize_sensors(manager)
+if FAKE_DATA:
+    import sensors_spoof as sensors
+    sensors.initialize_sensors(fake_path, manager)
+else:
+    import sensors
+    sensors.initialize_sensors(manager)
 data_filter.initialize_filter(manager)
 state.initialize_state(manager)
 scribe.initialize_file(manager)
+controller.initialize(manager)
 
 
 def main():

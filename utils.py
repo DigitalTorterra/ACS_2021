@@ -17,4 +17,4 @@ def format_float_list(in_list):
     """
     Formats a list into a more print-friendly format
     """
-    return [f'{i:.4f}' for i in in_list]
+    return [f'{i:.4f}' if type(i) is float else i for i in in_list]

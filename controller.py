@@ -153,7 +153,7 @@ def step(manager: Data_Manager):
     else:
         extension = 0
 
-    manager.update_dict_field('control_extension', extension)
+    manager.update_field('control_extension', extension)
 
     return extension
 
@@ -168,7 +168,7 @@ def get_angle(manager: Data_Manager):
     """
     extension = manager.read_field('control_extension').get_value()
     servo_angle = extension*angle_max
-    manager.update_dict_field('control_angle', servo_angle)
+    manager.update_field('control_angle', servo_angle)
 
     return servo_angle
 

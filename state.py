@@ -98,7 +98,7 @@ def state_transition(manager: Data_Manager):
     state_name = get_state_name()
                 
     # Record result
-    manager.update_dict_field('state', state_name)
+    manager.update_field('state', state_name)
 
     return state_name
             
