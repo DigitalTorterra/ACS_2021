@@ -17,7 +17,9 @@ angle = 0
 angle_min = 0
 angle_max = 70 # degrees. Mechanism is changing so don't actually know if this is right
 extension = 0  # 0 no extension, 1 full extension
-
+flightAltitude = []
+flightVelocity = []
+flightAccel = []
 # Function definitions
 def initialize(data):
     """
@@ -44,16 +46,15 @@ def step(data, extension):
     """
     height, velocity, acceleration, *_ = data
 
-
     # Set parameters
     # c = 1125.3  # [fps] speed of sound
     c = 343  #[m/s] speed of sound
     w_tabs = 1.71*0.0254  # [in to m] tab width
     L_max_tabs = 1.85*0.0254  # [in to m] max tab length/extension
     rho = 1.225  #[kg/m**3] density of air
-    M_e = 771.2/35.274  # [oz to kg] EMPTY mass of rocket
+    M_e = 303/35.274  # [oz to kg] EMPTY mass of rocket
     g = 9.81  # [m/s**2] gravity
-    theta = 5*np.pi/180  # [degrees to radians] launch angle
+    theta = 0*np.pi/180  # [degrees to radians] launch angle
     dt = 0.2  # [s] time step size
     targetApogee = 1615.44  # [m]
 
@@ -84,7 +85,7 @@ def step(data, extension):
     A_tabs = 4*w_tabs*(extension*L_max_tabs)  
 
     # rocket drag
-    Cd_rocket = 0.3 
+    Cd_rocket = 0.145 
     A_rocket = (6.17*0.0254/2)**2*np.pi  # [diamter in to m] [m**2]
 
 
@@ -100,32 +101,32 @@ def step(data, extension):
 
     while VySim > 0:  
         # k1vx = fx(VmagSim, Cd_rocket, Cd_tabs, A_tabs, theta, M_e) 
-        k1vy = fy(VmagSim, Cd_rocket, Cd_tabs, A_tabs, theta, M_e) 
+        k1vy = dt*fy(VmagSim, Cd_rocket, Cd_tabs, A_tabs, theta, M_e) 
         # k1rx = VxSim 
-        k1ry = VySim 
+        k1ry = dt*VySim 
         
         # k2vx = fx(VmagSim + 0.5*dt*k1rx, Cd_rocket, Cd_tabs, A_tabs, theta, M_e) 
-        k2vy = fy(VmagSim + 0.5*dt*k1ry, Cd_rocket, Cd_tabs, A_tabs, theta, M_e) 
+        k2vy = dt*fy(VmagSim + 0.5*k1vy, Cd_rocket, Cd_tabs, A_tabs, theta, M_e) 
         # k2rx = VxSim*k1vx*dt/2 
-        k2ry = VySim*k1vy*dt/2 
+        k2ry = dt*(VySim+k1vy/2)
         
         # k3vx = fx(VmagSim + 0.5*dt*k2rx, Cd_rocket, Cd_tabs, A_tabs, theta, M_e) 
-        k3vy = fy(VmagSim + 0.5*dt*k2ry, Cd_rocket, Cd_tabs, A_tabs, theta, M_e) 
+        k3vy = dt*fy(VmagSim + 0.5*k2vy, Cd_rocket, Cd_tabs, A_tabs, theta, M_e) 
         # k3rx = VxSim*k2vx*dt/2 
-        k3ry = VySim*k2vy*dt/2 
+        k3ry = dt*(VySim+k2vy/2)
         
         # k4vx = fx(VmagSim + dt*k3rx, Cd_rocket, Cd_tabs, A_tabs, theta, M_e) 
-        k4vy = fy(VmagSim + dt*k3ry, Cd_rocket, Cd_tabs, A_tabs, theta, M_e) 
+        k4vy = dt*fy(VmagSim + k3vy, Cd_rocket, Cd_tabs, A_tabs, theta, M_e) 
         # k4rx = VxSim*k3vx*dt 
-        k4ry = VySim*k3vy*dt 
+        k4ry = dt*(VySim + k3vy)
         
         # Find values at next timeStep
         # VxSim = VxSim + dt/6.0*(k1vx + 2.0*k2vx + 2.0*k3vx + k4vx) 
-        VySim = VySim + dt/6.0*(k1vy + 2.0*k2vy + 2.0*k3vy + k4vy) 
+        VySim = VySim + 1.0/6.0*(k1vy + 2.0*k2vy + 2.0*k3vy + k4vy) 
         VmagSim = np.sqrt(VxSim**2 + VySim**2) 
         
         # xSim = xSim + dt/6.0*(k1rx + 2*k2rx + 2*k3rx + k4rx) 
-        altSim = altSim + dt/6.0*(k1ry + 2*k2ry + 2*k3ry + k4ry) 
+        altSim = altSim + 1.0/6.0*(k1ry + 2*k2ry + 2*k3ry + k4ry) 
         
         # Calculate new drag coefficient for tabs/(rocket?)
         Mach = VmagSim/c 
@@ -134,14 +135,16 @@ def step(data, extension):
     SimApogee = altSim 
     error = SimApogee - targetApogee 
 
+
     ## PID/angle selection
-    if error < 0:
-        extension = 0  # if simulated apogee is below target, stop
-    elif error > 100: 
-        extension = 1  # if simulated apogee is > 100 m above target, full extension
-    else:
-        kp = 0.01 
-        extension = kp*error 
+    # if error < 0:
+    #     extension = 0  # if simulated apogee is below target, stop
+    # elif error > 100: 
+    #     extension = 1  # if simulated apogee is > 100 m above target, full extension
+    # else:
+
+    dExt = 0.0007*error
+    extension = extension + dExt
     
 
     if extension > 1:
@@ -202,5 +205,5 @@ def fx(V, Cd_rocket, Cd_tabs, A_tabs, theta, M_e):
     g = 9.81 #[m/s**2] gravity
     A_rocket = (6.17*0.0254/2)**2*np.pi # [diamter in to m] [m**2]
 
-    Kx = -(0.5*rho*Cd_rocket*V**2*A_rocket*np.cos(theta) - 0.5*rho*Cd_tabs*V**2*A_tabs*np.cos(theta))/M_e
+    Kx = (-0.5*rho*Cd_rocket*V**2*A_rocket*np.cos(theta) - 0.5*rho*Cd_tabs*V**2*A_tabs*np.cos(theta))/M_e
     return Kx
