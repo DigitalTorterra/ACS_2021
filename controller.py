@@ -16,7 +16,7 @@ from data_manager import Data_Manager
 # Global Variables
 angle = 0
 angle_min = 0
-angle_max = 70 # degrees. Mechanism is changing so don't actually know if this is right
+angle_max = 30 # degrees. Mechanism is changing so don't actually know if this is right
 extension = 0  # 0 no extension, 1 full extension
 flightAltitude = []
 flightVelocity = []

@@ -4,8 +4,13 @@ the servo motor
 """
 
 # Import modules
+import RPi.GPIO as GPIO
 
 # Global variables
+
+# Constants
+SERVO_PIN = 13
+servo = None
 
 # Functions
 def initialize_servo():
@@ -16,7 +21,20 @@ def initialize_servo():
     Input: None
     Output: boolean value, True if successful
     """
-    return False
+    
+    # Setup the GPIO library
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(servoPIN, GPIO.OUT)
+
+    # Initalize the servo
+    global servo
+    servo = GPIO.PWM(servoPIN, 50) # GPIO 13 for PWM with 50Hz
+    servo.start(2.5) # Initialization
+
+def clean_servo():
+    global servo
+    servo.stop()
+    GPIO.cleanup()
 
 def rotate(angle):
     """

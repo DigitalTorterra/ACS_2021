@@ -32,6 +32,7 @@ else:
 data_filter.initialize_filter(manager)
 state.initialize_state(manager)
 scribe.initialize_file(manager)
+servo.initialize_servo()
 controller.initialize(manager)
 
 
@@ -58,10 +59,6 @@ def main():
         # Log output
         scribe.write_row(manager)
 
-        # Output to file
-        #scribe.write_row(data, filtered_data, servo_angle,
-        #        curr_state)
-
         # Handle error
         #except:
         #    print('We regret to inform you that your code has a tumor')
@@ -69,3 +66,4 @@ def main():
 # Python stuff to make code more clean
 if __name__ == '__main__':
     main()
+    servo.clean_servo()
