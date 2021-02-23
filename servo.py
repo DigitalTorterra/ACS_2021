@@ -4,7 +4,8 @@ the servo motor
 """
 
 # Import modules
-import RPi.GPIO as GPIO
+from gpiozero import Servo
+from controller import angle_max
 
 # Global variables
 
@@ -23,18 +24,25 @@ def initialize_servo():
     """
     
     # Setup the GPIO library
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(servoPIN, GPIO.OUT)
+    # GPIO.setmode(GPIO.BCM)
+    # GPIO.setup(SERVO_PIN, GPIO.OUT)
 
-    # Initalize the servo
+    # # Initalize the servo
+    # global servo
+    # servo = GPIO.PWM(SERVO_PIN, 50) # GPIO 13 for PWM with 50Hz
+    # servo.start(2.5) # Initialization
+    
+    # Setup range
+    myCorrection = 0
+    maxPW = (2.0+myCorrection)/1000
+    minPW = (1.0-myCorrection)/1000
+
+    # Initialize servo
     global servo
-    servo = GPIO.PWM(servoPIN, 50) # GPIO 13 for PWM with 50Hz
-    servo.start(2.5) # Initialization
+    servo = Servo(SERVO+PI, min_pulse_width=minPW, max_pulse_width=maxPW)
 
 def clean_servo():
-    global servo
-    servo.stop()
-    GPIO.cleanup()
+    pass
 
 def rotate(angle):
     """
@@ -45,4 +53,11 @@ def rotate(angle):
     rotate the servo to
     Output: None
     """
-    pass
+
+    # Calculate extension
+    extension = 2*(angle/angle_max) - 1
+
+    # Set servo
+    global servo
+    servo.value = extension
+

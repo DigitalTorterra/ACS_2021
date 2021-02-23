@@ -27,6 +27,24 @@ times = None
 
 read_row = lambda data, key: [row[key] for row in data]
 
+# Column names
+TIME_VAL     = 'Time ms'
+ADXL_ACCEL_X = 'ADXL X Acceleration'
+ADXL_ACCEL_Y = 'ADXL Y Acceleration'
+ADXL_ACCEL_Z = 'ADXL Z Acceleration'
+MPL_ALT      = 'Altitude m'
+MPU_ACCEL_X  = 'mpu_acceleration_x'
+MPU_ACCEL_Y  = 'mpu_acceleration_y'
+MPU_ACCEL_Z  = 'mpu_acceleration_z'
+MPU_GYRO_X   = 'mpu_gyroscope_x'
+MPU_GYRO_Y   = 'mpu_gyroscope_y'
+MPU_GYRO_Z   = 'mpu_gyroscope_z'
+MPU_MAGN_X   = 'mpu_magnetometer_x' 
+MPU_MAGN_Y   = 'mpu_magnetometer_y' 
+MPU_MAGN_Z   = 'mpu_magnetometer_z' 
+
+
+
 # Initialization functions
 def initialize_accelerometer(manager: Data_Manager, rows) -> bool:
     """
@@ -44,9 +62,9 @@ def initialize_accelerometer(manager: Data_Manager, rows) -> bool:
     # adxl_accelerationadxl_x = read_row(rows, 'adxl_acceleration_x')
     # adxl_accelerationadxl_y = read_row(rows, 'adxl_acceleration_y')
     # adxl_accelerationadxl_z = read_row(rows, 'adxl_acceleration_z')
-    adxl_x = read_row(rows, 'ADXL X Acceleration')
-    adxl_y = read_row(rows, 'ADXL Y Acceleration')
-    adxl_z = read_row(rows, 'ADXL Z Acceleration')
+    adxl_x = read_row(rows, ADXL_ACCEL_X)
+    adxl_y = read_row(rows, ADXL_ACCEL_Y)
+    adxl_z = read_row(rows, ADXL_ACCEL_Z)
 
 
     accelerometer = iter(zip(adxl_x, adxl_y, adxl_z))
@@ -66,7 +84,7 @@ def initialize_altimeter(manager: Data_Manager, rows) -> bool:
 
     manager.add_data(data_manager.Scalar_Data('mpl_altitude'))
 
-    altimeter = iter(read_row(rows, 'Altitude m'))
+    altimeter = iter(read_row(rows, MPL_ALT))
     
     return True
 
@@ -85,15 +103,15 @@ def initialize_imu(manager: Data_Manager, rows) -> bool:
     manager.add_data(data_manager.Tuple_Data('mpu_gyroscope'))
     manager.add_data(data_manager.Tuple_Data('mpu_magnetometer'))
 
-    mpu_accel_x = read_row(rows, 'mpu_acceleration_x')
-    mpu_accel_y = read_row(rows, 'mpu_acceleration_y')
-    mpu_accel_z = read_row(rows, 'mpu_acceleration_z')
-    mpu_gyro_x = read_row(rows, 'mpu_gyroscope_x')
-    mpu_gyro_y = read_row(rows, 'mpu_gyroscope_y')
-    mpu_gyro_z = read_row(rows, 'mpu_gyroscope_z')
-    mpu_mag_x = read_row(rows, 'mpu_magnetometer_x')
-    mpu_mag_y = read_row(rows, 'mpu_magnetometer_y')
-    mpu_mag_z = read_row(rows, 'mpu_magnetometer_z')
+    mpu_accel_x = read_row(rows, MPU_ACCEL_X)
+    mpu_accel_y = read_row(rows, MPU_ACCEL_Y)
+    mpu_accel_z = read_row(rows, MPU_ACCEL_Z)
+    mpu_gyro_x = read_row(rows, MPU_GYRO_X)
+    mpu_gyro_y = read_row(rows, MPU_GYRO_Y)
+    mpu_gyro_z = read_row(rows, MPU_GYRO_Z)
+    mpu_mag_x = read_row(rows, MPU_MAGN_X)
+    mpu_mag_y = read_row(rows, MPU_MAGN_Y)
+    mpu_mag_z = read_row(rows, MPU_MAGN_Z)
 
     imu = iter(zip(mpu_accel_x, mpu_accel_y, mpu_accel_z,
                    mpu_gyro_x, mpu_gyro_y, mpu_gyro_z,
@@ -109,7 +127,7 @@ def initialize_timer(manager: Data_Manager, rows) -> bool:
     manager.add_data(data_manager.Scalar_Data('time'))
 
     global times
-    times = iter(read_row(rows, 'Time ms'))
+    times = iter(read_row(rows, TIME_VAL))
 
     return True
 
