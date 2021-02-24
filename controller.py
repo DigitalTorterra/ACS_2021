@@ -49,7 +49,7 @@ def step(manager: Data_Manager):
         # c = 1125.3  # [fps] speed of sound
         c = 343  #[m/s] speed of sound
         w_tabs = 1.71*0.0254  # [in to m] tab width
-        L_max_tabs = 1.85*0.0254  # [in to m] max tab length/extension
+        L_max_tabs = 1.4*0.0254  # [in to m] max tab length/extension
         rho = 1.225  #[kg/m**3] density of air
         M_e = 303/35.274  # [oz to kg] EMPTY mass of rocket
         g = 9.81  # [m/s**2] gravity
