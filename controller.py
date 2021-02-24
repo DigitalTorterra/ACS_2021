@@ -54,7 +54,7 @@ def step(manager: Data_Manager):
         M_e = 303/35.274  # [oz to kg] EMPTY mass of rocket
         g = 9.81  # [m/s**2] gravity
         theta = 0*np.pi/180  # [degrees to radians] launch angle
-        dt = 0.1  # [s] time step size
+        dt = 0.15  # [s] time step size
         targetApogee = 1615.44  # [m]
 
         # Initial conditions for simulation at BURNOUT, initalize variables for in flight
