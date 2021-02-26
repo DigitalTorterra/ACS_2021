@@ -129,7 +129,7 @@ def step(manager: Data_Manager):
             
             # Calculate new drag coefficient for tabs/(rocket?)
             Mach = VmagSim/c
-            if Mach >= 1
+            if Mach >= 1.0:
                 Mach = 0.99
             Cd_tabs = 1/np.sqrt(1-Mach**2)*Cd_o_tabs 
 
