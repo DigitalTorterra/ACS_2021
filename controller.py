@@ -18,6 +18,7 @@ angle = 0
 angle_min = 0
 angle_max = 30 # degrees. Mechanism is changing so don't actually know if this is right
 extension = 0  # 0 no extension, 1 full extension
+t_prev = None
 flightAltitude = []
 flightVelocity = []
 flightAccel = []
@@ -25,6 +26,21 @@ flightAccel = []
 def initialize(manager: Data_Manager):
     manager.add_data(data_manager.Scalar_Data('control_extension'))
     manager.add_data(data_manager.Scalar_Data('control_angle'))
+
+def get_dt(in_time):
+    """
+    Appropriately handle the creation of
+    a timestep from the current and previous
+    times.
+    """
+    global t_prev
+
+    if t_prev == None:
+        dt = 0.1
+    else:
+        dt = in_time - t_prev
+    t_prev = in_time
+    return dt
 
 def step(manager: Data_Manager):
     """
@@ -38,6 +54,8 @@ def step(manager: Data_Manager):
     """
     
     # Read data
+    t = float(manager.read_field('time').get_value())
+    dt = get_dt(t)
     state = manager.read_field('state').get_value()
     height = manager.read_field('kalman_height').get_value()
     velocity = manager.read_field('kalman_velocity').get_value()
