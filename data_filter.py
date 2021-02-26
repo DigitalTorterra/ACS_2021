@@ -93,10 +93,11 @@ def get_dt(in_time):
     return dt
 
 def transform_adxl(in_accel):
-    return float(in_accel[0])*-1-10.340865
+    #return float(in_accel[0])*-1-10.340865
+    return float(in_accel[0])
 
 def transform_mpu(in_accel):
-    return float(in_accel[1])
+    return float(in_accel[2])
 
 
 def filter_data(manager: Data_Manager):
