@@ -42,7 +42,8 @@ def initialize_servo():
     servo = Servo(SERVO_PIN, min_pulse_width=minPW, max_pulse_width=maxPW)
 
 def clean_servo():
-    pass
+    global servo
+    servo.detach()
 
 def rotate(angle):
     """
