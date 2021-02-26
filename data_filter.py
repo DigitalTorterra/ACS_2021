@@ -44,13 +44,14 @@ def initialize_filter(manager: Data_Manager):
     my_filter.H = np.array(H)
 
     # Covariance matrix
-    my_filter.P *= 100
+    my_filter.P *= 1
 
     # Measurement Noise
-    my_filter.R *= 5
+    my_filter.R *= 1
 
     # Process Noise
-    my_filter.Q = Q_discrete_white_noise(dim=3, dt=0.1, var=0.13)
+    # my_filter.Q = Q_discrete_white_noise(dim=3, dt=0.1, var=0.13)
+    my_filter.Q *= 1
 
     # Initial position
     my_filter.x = np.array([0,0,0])
