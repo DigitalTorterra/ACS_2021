@@ -6,7 +6,7 @@ write output.
 """
 
 FAKE_DATA = True
-fake_path = 'fake_data/Success.csv'
+fake_path = 'fakeDataSuccess.txt'
 
 # Import modules
 import sensors
