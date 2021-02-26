@@ -1,3 +1,4 @@
+Time ms,ADXL X Acceleration,ADXL Y Acceleration,ADXL Z Acceleration,Altitude m
 0,0,0,0,0,0
 0.02,-18.347,0,0,429.34,0.26844
 0.04,-19.636,0,0,433.47,0.4899
