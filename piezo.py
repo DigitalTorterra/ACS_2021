@@ -31,7 +31,7 @@ def update_buzzer(manager: Data_Manager):
     if next_state == 'Armed':
         buzzer.play(440)
     elif next_state == 'Launched' or next_state == 'Apogee':
-        buzzer.play(200)
+        buzzer.play(300)
     elif next_state == 'Burnout' or next_state == 'Overshoot': 
         buzzer.play(600)
 

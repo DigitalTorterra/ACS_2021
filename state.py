@@ -78,7 +78,7 @@ def state_transition(manager: Data_Manager):
         elif height > OVERSHOOOT_HEIGHT:
             next_state = get_state('Overshoot')
 
-        elif acceleration > BURNOUT_ACCEL:
+        elif height < BURNOUT_HEIGHT:
             next_state = get_state('Launched')
 
     # Apogee

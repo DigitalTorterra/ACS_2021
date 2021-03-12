@@ -28,6 +28,7 @@ times = None
 read_row = lambda data, key: [row[key] for row in data]
 
 # Column names
+"""
 TIME_VAL     = 'Time ms'
 ADXL_ACCEL_X = 'ADXL X Acceleration'
 ADXL_ACCEL_Y = 'ADXL Y Acceleration'
@@ -42,7 +43,22 @@ MPU_GYRO_Z   = 'mpu_gyroscope_z'
 MPU_MAGN_X   = 'mpu_magnetometer_x' 
 MPU_MAGN_Y   = 'mpu_magnetometer_y' 
 MPU_MAGN_Z   = 'mpu_magnetometer_z' 
+"""
 
+TIME_VAL     = 'time'
+ADXL_ACCEL_X = 'adxl_acceleration_x'
+ADXL_ACCEL_Y = 'adxl_acceleration_y'
+ADXL_ACCEL_Z = 'adxl_acceleration_z'
+MPL_ALT      = 'mpl_altitude'
+MPU_ACCEL_X  = 'mpu_acceleration_x'
+MPU_ACCEL_Y  = 'mpu_acceleration_y'
+MPU_ACCEL_Z  = 'mpu_acceleration_z'
+MPU_GYRO_X   = 'mpu_gyroscope_x'
+MPU_GYRO_Y   = 'mpu_gyroscope_y'
+MPU_GYRO_Z   = 'mpu_gyroscope_z'
+MPU_MAGN_X   = 'mpu_magnetometer_x' 
+MPU_MAGN_Y   = 'mpu_magnetometer_y' 
+MPU_MAGN_Z   = 'mpu_magnetometer_z' 
 
 
 # Initialization functions
@@ -106,16 +122,16 @@ def initialize_imu(manager: Data_Manager, rows) -> bool:
     mpu_accel_x = read_row(rows, MPU_ACCEL_X)
     mpu_accel_y = read_row(rows, MPU_ACCEL_Y)
     mpu_accel_z = read_row(rows, MPU_ACCEL_Z)
-    mpu_gyro_x = read_row(rows, MPU_GYRO_X)
-    mpu_gyro_y = read_row(rows, MPU_GYRO_Y)
-    mpu_gyro_z = read_row(rows, MPU_GYRO_Z)
-    mpu_mag_x = read_row(rows, MPU_MAGN_X)
-    mpu_mag_y = read_row(rows, MPU_MAGN_Y)
-    mpu_mag_z = read_row(rows, MPU_MAGN_Z)
+    mpu_gyro_x  = read_row(rows, MPU_GYRO_X)
+    mpu_gyro_y  = read_row(rows, MPU_GYRO_Y)
+    mpu_gyro_z  = read_row(rows, MPU_GYRO_Z)
+    mpu_mag_x   = read_row(rows, MPU_MAGN_X)
+    mpu_mag_y   = read_row(rows, MPU_MAGN_Y)
+    mpu_mag_z   = read_row(rows, MPU_MAGN_Z)
 
     imu = iter(zip(mpu_accel_x, mpu_accel_y, mpu_accel_z,
-                   mpu_gyro_x, mpu_gyro_y, mpu_gyro_z,
-                   mpu_mag_x, mpu_mag_y, mpu_mag_z))
+                   mpu_gyro_x,  mpu_gyro_y,  mpu_gyro_z,
+                   mpu_mag_x,   mpu_mag_y,   mpu_mag_z))
 
     return True
 
@@ -198,9 +214,11 @@ def read_imu(manager: Data_Manager):
     magnet_val = data[3:6]
     gyro_val = data[6:]
 
-    manager.update_dict_field('mpu_acceleration', accel)
-    manager.update_dict_field('mpu_magnetometer', magnet_val)
-    manager.update_dict_field('mpu_gyroscope', gyro_val)
+    print(data)
+
+    manager.update_field('mpu_acceleration', accel)
+    manager.update_field('mpu_magnetometer', magnet_val)
+    manager.update_field('mpu_gyroscope', gyro_val)
 
 def read_time(manager: Data_Manager):
     """
