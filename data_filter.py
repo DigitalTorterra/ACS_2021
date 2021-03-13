@@ -93,11 +93,14 @@ def get_dt(in_time):
     return dt
 
 def transform_adxl(in_accel):
-    #return float(in_accel[0])*-1-10.340865
-    return float(in_accel[0])
+    out_accel = float(in_accel[2])-9.5244
+    #print(f'ADXL: {in_accel[2]}, {out_accel}')
+    return out_accel
 
 def transform_mpu(in_accel):
-    return float(in_accel[2])
+    out_accel = float(in_accel[2])
+    #print(f'MPU: {in_accel[2]}, {out_accel}')
+    return out_accel
 
 
 def filter_data(manager: Data_Manager):
@@ -156,3 +159,5 @@ def filter_data(manager: Data_Manager):
     manager.update_field('kalman_height', y)
     manager.update_field('kalman_velocity', v)
     manager.update_field('kalman_acceleration', a)
+
+    #print(f'Kalman: {a}')
