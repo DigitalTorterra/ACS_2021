@@ -18,6 +18,8 @@ from filterpy.common import Q_discrete_white_noise
 my_filter = None
 t_prev = None
 
+g = 9.80665
+
 
 # Functions
 def initialize_filter(manager: Data_Manager):
@@ -98,7 +100,7 @@ def transform_adxl(in_accel):
     return out_accel
 
 def transform_mpu(in_accel):
-    out_accel = float(in_accel[2])
+    out_accel = g*(float(in_accel[2])-0.53)
     #print(f'MPU: {in_accel[2]}, {out_accel}')
     return out_accel
 

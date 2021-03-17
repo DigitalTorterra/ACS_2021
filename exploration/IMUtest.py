@@ -16,6 +16,14 @@ import sys
 
 mpu9250 = FaBo9Axis_MPU9250.MPU9250()
 
+total = 0
+n = 1000
+for i in range(n):
+    accel = mpu9250.readAccel()
+    total += accel['z']
+    time.sleep(0.02)
+print(total/n)
+
 try:
     while True:
         accel = mpu9250.readAccel()

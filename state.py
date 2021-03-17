@@ -6,10 +6,12 @@ getting specific values for the transitions.
 
 # Import libraries
 import data_manager
+import time
 from data_manager import Data_Manager
 
 # Global variables
 state = 0
+t_end = None
 
 # Constants
 state_values = [
@@ -29,6 +31,7 @@ OVERSHOOOT_HEIGHT = 1621
 LANDED_ACCEL = 0
 LANDED_VELOCITY = 10
 LANDED_HEIGHT = 10
+CYCLE_DELAY = 300
 
 # Functions
 def initialize_state(manager: Data_Manager):
@@ -88,11 +91,21 @@ def state_transition(manager: Data_Manager):
         
         elif acceleration < LANDED_ACCEL and velocity < LANDED_VELOCITY and height < LANDED_HEIGHT:
             next_state = get_state('Landed')
+            global t_end
+            t_end = time.time()
 
     # Overshoot
     if state == get_state('Overshoot'):
         if velocity < APOGEE_VELOCITY:
             next_state = get_state('Apogee')
+
+    # Landed
+    if state == get_state('Landed'):
+        dt = time.time() - t_end
+        if dt > CYCLE_DELAY:
+            next_state = get_state('Armed')
+
+
 
     state = next_state
     state_name = get_state_name()

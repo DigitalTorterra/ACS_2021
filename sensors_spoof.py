@@ -45,7 +45,7 @@ MPU_MAGN_Y   = 'mpu_magnetometer_y'
 MPU_MAGN_Z   = 'mpu_magnetometer_z' 
 """
 
-TIME_VAL     = 'time'
+TIME_VAL     = '\ufefftime'
 ADXL_ACCEL_X = 'adxl_acceleration_x'
 ADXL_ACCEL_Y = 'adxl_acceleration_y'
 ADXL_ACCEL_Z = 'adxl_acceleration_z'
@@ -160,6 +160,7 @@ def initialize_sensors(path: str, manager: Data_Manager) -> bool:
         rows = [row for row in reader]
 
     # Initialize active sensors
+    print(rows[0].keys())
     result = initialize_timer(manager, rows)
     for sensor in manager.active_sensors:
         if sensor == 'IMU':
