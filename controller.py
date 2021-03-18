@@ -72,7 +72,7 @@ def step(manager: Data_Manager):
         M_e = 303/35.274  # [oz to kg] EMPTY mass of rocket
         g = 9.81  # [m/s**2] gravity
         theta = 0*np.pi/180  # [degrees to radians] launch angle
-        dt = 0.1  # [s] time step size
+        dt = 0.02  # [s] time step size
         targetApogee = 1615.44  # [m]
 
         # Initial conditions for simulation at BURNOUT, initalize variables for in flight
@@ -117,32 +117,23 @@ def step(manager: Data_Manager):
         xSim = x_R 
 
         while VySim > 0:  
-            # k1vx = fx(VmagSim, Cd_rocket, Cd_tabs, A_tabs, theta, M_e) 
             k1vy = dt*fy(VmagSim, Cd_rocket, Cd_tabs, A_tabs, theta, M_e) 
-            # k1rx = VxSim 
             k1ry = dt*VySim 
             
-            # k2vx = fx(VmagSim + 0.5*dt*k1rx, Cd_rocket, Cd_tabs, A_tabs, theta, M_e) 
             k2vy = dt*fy(VmagSim + 0.5*k1vy, Cd_rocket, Cd_tabs, A_tabs, theta, M_e) 
-            # k2rx = VxSim*k1vx*dt/2 
             k2ry = dt*(VySim + k1vy/2)
             
-            # k3vx = fx(VmagSim + 0.5*dt*k2rx, Cd_rocket, Cd_tabs, A_tabs, theta, M_e) 
             k3vy = dt*fy(VmagSim + 0.5*k2vy, Cd_rocket, Cd_tabs, A_tabs, theta, M_e) 
-            # k3rx = VxSim*k2vx*dt/2 
             k3ry = dt*(VySim + k2vy/2)
             
-            # k4vx = fx(VmagSim + dt*k3rx, Cd_rocket, Cd_tabs, A_tabs, theta, M_e) 
             k4vy = dt*fy(VmagSim + k3vy, Cd_rocket, Cd_tabs, A_tabs, theta, M_e) 
-            # k4rx = VxSim*k3vx*dt 
             k4ry = dt*(VySim + k3vy)
             
             # Find values at next timeStep
-            # VxSim = VxSim + dt/6.0*(k1vx + 2.0*k2vx + 2.0*k3vx + k4vx) 
             VySim = VySim + 1.0/6.0*(k1vy + 2.0*k2vy + 2.0*k3vy + k4vy) 
-            VmagSim = np.sqrt(VxSim**2 + VySim**2) 
+            # VmagSim = np.sqrt(VxSim**2 + VySim**2) 
+            VmagSim = VySim
             
-            # xSim = xSim + dt/6.0*(k1rx + 2*k2rx + 2*k3rx + k4rx) 
             altSim = altSim + 1.0/6.0*(k1ry + 2*k2ry + 2*k3ry + k4ry) 
             
             # Calculate new drag coefficient for tabs/(rocket?)
