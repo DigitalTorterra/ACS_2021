@@ -102,7 +102,7 @@ def step(manager: Data_Manager):
         A_tabs = 4*w_tabs*(extension*L_max_tabs)  
 
         # rocket drag
-        Cd_rocket = 0.145
+        Cd_rocket = 0.14
         A_rocket = (6.17*0.0254/2)**2*np.pi  # [diamter in to m] [m**2]
 
 

@@ -12,7 +12,6 @@ from data_manager import Data_Manager
 # Global variables
 state = 0
 t_end = None
-
 # Constants
 state_values = [
     'Armed',
@@ -91,8 +90,6 @@ def state_transition(manager: Data_Manager):
         
         elif acceleration < LANDED_ACCEL and velocity < LANDED_VELOCITY and height < LANDED_HEIGHT:
             next_state = get_state('Landed')
-            global t_end
-            t_end = time.time()
 
     # Overshoot
     if state == get_state('Overshoot'):
@@ -104,7 +101,6 @@ def state_transition(manager: Data_Manager):
         dt = time.time() - t_end
         if dt > CYCLE_DELAY:
             next_state = get_state('Armed')
-
 
 
     state = next_state
