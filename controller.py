@@ -165,10 +165,12 @@ def step(manager: Data_Manager):
 
     elif state == 'Overshoot':
         extension = 1
+        SimApogee = -1
         dExt = 0
         
     else:
         extension = 0
+        SimApogee = -1
         dExt = 0
 
     manager.update_field('control_extension', extension)
