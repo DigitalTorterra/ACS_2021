@@ -26,6 +26,8 @@ flightAccel = []
 def initialize(manager: Data_Manager):
     manager.add_data(data_manager.Scalar_Data('control_extension'))
     manager.add_data(data_manager.Scalar_Data('control_angle'))
+    manager.add_data(data_manager.Scalar_Data('control_extension_change'))
+    manager.add_data(data_manager.Scalar_Data('control_simulated_apogee'))
 
 def get_dt(in_time):
     """
@@ -163,11 +165,15 @@ def step(manager: Data_Manager):
 
     elif state == 'Overshoot':
         extension = 1
+        dExt = 0
         
     else:
         extension = 0
+        dExt = 0
 
     manager.update_field('control_extension', extension)
+    manager.update_field('control_extension_change', dExt)
+    manager.update_field('control_simulated_apogee', SimApogee)
 
     return extension
 

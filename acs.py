@@ -5,7 +5,7 @@ update the flight state, move the servo, and
 write output.
 """
 
-FAKE_DATA = False
+FAKE_DATA = True
 fake_path = 'simulation_3_13.csv'
 
 # Import modules
