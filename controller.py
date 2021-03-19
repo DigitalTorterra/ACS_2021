@@ -216,7 +216,7 @@ def fy(V, Cd_rocket, Cd_tabs, A_tabs, theta, M_e):
     g = 9.81 # [m/s **2] gravity
     A_rocket = (6.17*0.0254/2)**2*np.pi # [diamter in to m] [m**2]
 
-    Ky = (-0.5*rho*Cd_rocket*V**2*A_rocket*np.sin(theta) - 0.5*rho*Cd_tabs*V**2*A_tabs*np.sin(theta) - M_e*g)/M_e
+    Ky = (-0.5*rho*Cd_rocket*V**2*A_rocket*np.cos(theta) - 0.5*rho*Cd_tabs*V**2*A_tabs*np.cos(theta) - M_e*g)/M_e
 
     return Ky
  
