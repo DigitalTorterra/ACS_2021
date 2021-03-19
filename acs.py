@@ -60,7 +60,8 @@ def main():
             servo_angle = controller.get_angle(manager)
 
             # Servo
-            servo.rotate(servo_angle)
+            servo_on = curr_state in ['Burnout', 'Overshoot']
+            servo.rotate(servo_angle, servo_on)
 
             # Log output
             scribe.write_row(manager)
