@@ -45,7 +45,7 @@ def clean_servo():
     global servo
     servo.detach()
 
-def rotate(angle):
+def rotate(angle, servo_on):
     """
     Author:
     This function rotates the servo to the desired
@@ -55,10 +55,14 @@ def rotate(angle):
     Output: None
     """
 
-    # Calculate extension
-    extension = 2*(angle/angle_max) - 1
-
-    # Set servo
     global servo
-    servo.value = extension
+
+    if servo_on:
+        # Calculate extension
+        extension = 2*(angle/angle_max) - 1
+
+        # Set servo
+        servo.value = extension
+    else:
+        servo.value = None
 

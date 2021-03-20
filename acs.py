@@ -9,6 +9,7 @@ FAKE_DATA = False
 fake_path = 'simulation_3_13.csv'
 
 # Import modules
+import traceback
 import time
 import data_filter
 import state
@@ -19,9 +20,9 @@ import piezo
 from data_manager import Data_Manager
 
 # Configuration
-active_sensors = ['IMU', 'Accelerometer', 'Altimeter']
+# active_sensors = ['IMU', 'Accelerometer', 'Altimeter']
 # active_sensors = ['IMU', 'Altimeter']
-# active_sensors = ['Accelerometer', 'Altimeter']
+active_sensors = ['Accelerometer', 'Altimeter']
 manager = Data_Manager(active_sensors)
 
 # Initialize modules
@@ -59,15 +60,17 @@ def main():
             servo_angle = controller.get_angle(manager)
 
             # Servo
-            servo.rotate(servo_angle)
+            servo_on = curr_state in ['Burnout', 'Overshoot']
+            servo.rotate(servo_angle, servo_on)
 
             # Log output
             scribe.write_row(manager)
             piezo.update_buzzer(manager)
 
         # Handle error
-        except:
+        except Exception:
             print('We regret to inform you that your code has a tumor')
+            print(traceback.format_exc())
 
 # Python stuff to make code more clean
 if __name__ == '__main__':
